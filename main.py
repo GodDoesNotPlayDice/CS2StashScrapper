@@ -38,12 +38,14 @@ async def main():
             except Exception as e:
                 print("Failed to get pages, retrying...")
                 print(e)
+                await page.screenshot(path='market_before.png')
                 await page.reload()
                 
         print("Getting items")
         while min_pages <= max_pages:
             while True:
-                await page.screenshot(path='screenshot.png')
+                await page.screenshot(path='market.png')
+                time.sleep(10)
                 items = await page.query_selector_all('.market_listing_row_link')
                 if len(items) < 1:
                     print("Failed to get items, retrying...")
@@ -52,11 +54,17 @@ async def main():
                     break
             for item in items:
                 item_name = await item.query_selector('span.market_listing_item_name')
-                print(await item_name.inner_text())
+                item_price = await item.query_selector('span.normal_price')
+                item_cantity = await item.query_selector('span.market_listing_num_listings_qty')
+                print("Name: " + await item_name.inner_text())
+                print("Cantity: " + await item_cantity.inner_text())
+                print("Price: " + await item_price.inner_text())
+
                 
-            print("Changing page")    
-            await page.goto(base_market_url + cases_url + "#p" + str(min_pages) + "_price_asc", timeout=80000)
-            min_pages += 1
+            # print("Changing page")    
+            # await page.goto(base_market_url + cases_url + "#p" + str(min_pages) + "_price_asc", timeout=80000)
+            # min_pages += 1
+            break
             
         await browser.close()
 
